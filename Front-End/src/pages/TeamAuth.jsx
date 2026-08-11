@@ -41,6 +41,7 @@ function StartLights() {
 function TeamAuth() {
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [showPassword, setShowPassword] = useState(false)
+  const [apiError, setApiError] = useState('')
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -58,24 +59,34 @@ function TeamAuth() {
 
   const switchMode = (next) => {
     setMode(next)
+    setApiError('')
     reset()
   }
 
   const onSubmit = async (data) => {
+    setApiError('')
     try {
-      if (mode === 'login') {
-        // TODO: replace with your real auth call
-        // await dispatch(loginTeamMember({ email: data.email, password: data.password })).unwrap()
-        await mockAuth(data)
-      } else {
-        // TODO: replace with your real signup call
-        // await dispatch(signupTeamMember(data)).unwrap()
-        await mockAuth(data)
+      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/signup'
+      const body = mode === 'login'
+        ? { email: data.email, password: data.password }
+        : { name: data.name, email: data.email, password: data.password }
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+
+      const result = await res.json()
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Authentication failed')
       }
-      dispatch(login({ userData: { name: data.name, email: data.email } }))
+
+      dispatch(login({ userData: result.team, token: result.token }))
       navigate('/team')
     } catch (err) {
-      // surfaced via react-hook-form root error, or swap for a toast
+      setApiError(err.message)
       console.error(err)
     }
   }
@@ -145,6 +156,12 @@ function TeamAuth() {
               ? 'Enter your credentials to open the console.'
               : 'Create an account to get on the pit wall.'}
           </p>
+
+          {apiError && (
+            <div className="mt-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+              {apiError}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
             {mode === 'signup' && (
@@ -305,12 +322,6 @@ function Field({ label, icon: Icon, error, trailing, children }) {
       {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
     </div>
   )
-}
-
-// Placeholder — swap for your real auth call
-async function mockAuth(data) {
-  await new Promise((r) => setTimeout(r, 600))
-  return data
 }
 
 export default TeamAuth

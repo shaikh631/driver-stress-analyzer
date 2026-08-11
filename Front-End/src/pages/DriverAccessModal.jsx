@@ -28,19 +28,32 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
   if (!isOpen) return null
 
   const onSubmit = async (data) => {
-    const code = data.digits.join('')
+    const code = data.digits.join('').toUpperCase()
 
     if (code.length !== 6) {
-      setError('digits', { message: 'Enter all 6 digits' })
+      setError('digits', { message: 'Enter all 6 characters' })
       return
     }
 
     try {
-      const isValid = await verifyDriverCode(code)
+      const res = await fetch('/api/driver/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pairingToken: code, driverName: 'Driver' }),
+      })
 
-      if (!isValid) {
-        throw new Error('Invalid driver access code')
+      const result = await res.json()
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Verification failed')
       }
+
+      // Store driver session for subsequent API calls
+      localStorage.setItem('driverSession', JSON.stringify({
+        sessionId: result.driverSessionId,
+        driverId: result.driverId,
+        teamName: result.teamName,
+      }))
 
       onSuccess()
     } catch (error) {
@@ -51,7 +64,7 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
   }
 
   const handlePaste = (event, onChangeAll) => {
-    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+    const pasted = event.clipboardData.getData('text').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 6)
 
     if (!pasted) return
 
@@ -82,7 +95,7 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
 
         <h2 className="mt-4 text-2xl font-black">Enter Driver Access Code</h2>
         <p className="mt-2 text-sm text-zinc-400">
-          Use the 6-digit race control code to open the driver protocol.
+          Use the 6-character team pairing code to open the driver protocol.
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -90,7 +103,7 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
             name="digits"
             control={control}
             rules={{
-              validate: (value) => value.join('').length === 6 || 'Enter all 6 digits',
+              validate: (value) => value.join('').length === 6 || 'Enter all 6 characters',
             }}
             render={({ field }) => (
               <div
@@ -104,12 +117,12 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
                       inputRefs.current[index] = element
                     }}
                     type="text"
-                    inputMode="numeric"
+                    inputMode="text"
                     maxLength={1}
                     value={digit}
                     onChange={(event) => {
-                      const value = event.target.value
-                      if (!/^\d?$/.test(value)) return
+                      const value = event.target.value.toUpperCase()
+                      if (!/^[A-Z0-9]?$/.test(value)) return
 
                       const nextDigits = [...field.value]
                       nextDigits[index] = value
@@ -124,7 +137,7 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
                         inputRefs.current[index - 1]?.focus()
                       }
                     }}
-                    className="h-12 w-10 rounded border border-zinc-700 bg-black text-center text-lg font-bold text-white outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/30 sm:w-12"
+                    className="h-12 w-10 rounded border border-zinc-700 bg-black text-center text-lg font-bold text-white uppercase outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/30 sm:w-12"
                   />
                 ))}
               </div>
@@ -155,11 +168,6 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
       </div>
     </div>
   )
-}
-
-async function verifyDriverCode(code) {
-  await new Promise((resolve) => window.setTimeout(resolve, 400))
-  return code === '123456'
 }
 
 export default DriverAccessModal
