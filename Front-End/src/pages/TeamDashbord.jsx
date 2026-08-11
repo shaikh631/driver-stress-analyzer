@@ -49,7 +49,8 @@ function TeamAuthPanel() {
   const onSubmit = async (data) => {
     setApiError('')
     try {
-      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/signup'
+      const base = import.meta.env.VITE_API_URL || ''
+      const endpoint = mode === 'login' ? `${base}/api/auth/login` : `${base}/api/auth/signup`
       const body = mode === 'login'
         ? { email: data.email, password: data.password }
         : { name: data.name, email: data.email, password: data.password }
@@ -195,9 +196,10 @@ function TeamDashboardPanel() {
 
   const fetchData = async () => {
     try {
+      const base = import.meta.env.VITE_API_URL || ''
       const [summaryRes, profileRes] = await Promise.all([
-        fetch('/api/dashboard/summary', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/team/me', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${base}/api/dashboard/summary`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${base}/api/team/me`, { headers: { Authorization: `Bearer ${token}` } }),
       ])
       if (summaryRes.ok) {
         const data = await summaryRes.json()
@@ -223,7 +225,8 @@ function TeamDashboardPanel() {
   const generateToken = async () => {
     setGenerating(true)
     try {
-      const res = await fetch('/api/team/pairing-token', {
+      const base = import.meta.env.VITE_API_URL || ''
+      const res = await fetch(`${base}/api/team/pairing-token`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -251,7 +254,8 @@ function TeamDashboardPanel() {
     const init = async () => {
       try {
         const { io } = await import('socket.io-client')
-        socket = io({ auth: { token } })
+        const base = import.meta.env.VITE_API_URL || ''
+        socket = io(base || '/', { auth: { token }, path: '/socket.io' })
         socket.on('radio:new', () => fetchData())
         socket.on('lap:new', () => fetchData())
       } catch {}

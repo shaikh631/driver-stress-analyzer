@@ -21,7 +21,8 @@ function History() {
     }
     const fetchHistory = async () => {
       try {
-        const res = await fetch('/api/radio/messages?limit=50', {
+        const base = import.meta.env.VITE_API_URL || ''
+        const res = await fetch(`${base}/api/radio/messages?limit=50`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {

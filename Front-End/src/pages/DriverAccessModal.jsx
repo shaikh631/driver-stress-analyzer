@@ -36,7 +36,8 @@ function DriverAccessModal({ isOpen, onClose, onSuccess }) {
     }
 
     try {
-      const res = await fetch('/api/driver/connect', {
+      const base = import.meta.env.VITE_API_URL || ''
+      const res = await fetch(`${base}/api/driver/connect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pairingToken: code, driverName: 'Driver' }),

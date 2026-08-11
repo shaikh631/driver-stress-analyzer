@@ -18,7 +18,8 @@ export default function DriverPortal() {
     const verifyDriver = async () => {
       setCheckingSession(true)
       try {
-        const res = await fetch('/api/driver/status', {
+        const base = import.meta.env.VITE_API_URL || ''
+        const res = await fetch(`${base}/api/driver/status`, {
           headers: { 'x-driver-session': driverSession.sessionId },
         })
         if (!res.ok) throw new Error('Driver session invalid or expired')
@@ -109,7 +110,8 @@ function ConnectView({ onConnected }) {
     setError('')
     setSubmitting(true)
     try {
-      const res = await fetch('/api/driver/connect', {
+      const base = import.meta.env.VITE_API_URL || ''
+      const res = await fetch(`${base}/api/driver/connect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pairingToken: code, driverName: driverName.trim() || 'Driver' }),
@@ -210,7 +212,8 @@ function PairedView({ session, onDisconnect }) {
     try {
       const formData = new FormData()
       formData.append('audio', blob, 'radio-clip.webm')
-      const res = await fetch('/api/radio/upload', {
+      const base = import.meta.env.VITE_API_URL || ''
+      const res = await fetch(`${base}/api/radio/upload`, {
         method: 'POST',
         headers: { 'x-driver-session': session.sessionId },
         body: formData,

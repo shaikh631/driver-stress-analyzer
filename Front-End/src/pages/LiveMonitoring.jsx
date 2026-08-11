@@ -28,10 +28,11 @@ function LiveMonitoring() {
 
   const fetchData = async () => {
     try {
+      const base = import.meta.env.VITE_API_URL || ''
       const [msgRes, lapRes] = await Promise.all([
-        fetch('/api/radio/messages?limit=10', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/laps', { headers: { Authorization: `Bearer ${token}` } }),
-      ])
+          fetch(`${base}/api/radio/messages?limit=10`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${base}/api/laps`, { headers: { Authorization: `Bearer ${token}` } }),
+        ])
       if (msgRes.ok) {
         const data = await msgRes.json()
         setMessages(data.messages || [])
@@ -57,7 +58,8 @@ function LiveMonitoring() {
     const connectSocket = async () => {
       try {
         const { io } = await import('socket.io-client')
-        socket = io({ auth: { token } })
+        const base = import.meta.env.VITE_API_URL || ''
+        socket = io(base || '/', { auth: { token }, path: '/socket.io' })
         socket.on('radio:new', () => fetchData())
         socket.on('lap:new', () => fetchData())
       } catch {}
