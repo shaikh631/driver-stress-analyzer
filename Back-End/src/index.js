@@ -83,6 +83,15 @@ async function start() {
     await mongoose.connect(config.DATABASE_URL);
     console.log('✅  Connected to MongoDB');
 
+    httpServer.on('error', (error) => {
+      if (error.syscall !== 'listen') throw error;
+      if (error.code === 'EADDRINUSE') {
+        console.error(`❌  Port ${config.PORT} is already in use. Set PORT in Back-End/.env or stop the process using that port.`);
+        process.exit(1);
+      }
+      throw error;
+    });
+
     httpServer.listen(config.PORT, () => {
       console.log(`🚀  Server running on http://localhost:${config.PORT}`);
       console.log(`📡  Socket.IO ready`);

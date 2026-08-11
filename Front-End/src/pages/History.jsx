@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
+const moodStyle = {
+  Calm: 'text-emerald-300',
+  Stressed: 'text-red-300',
+  Tired: 'text-yellow-300',
+  Frustrated: 'text-orange-300',
+  unknown: 'text-neutral-400',
+}
+
 function History() {
   const token = useSelector((state) => state.auth.token)
   const [messages, setMessages] = useState([])
@@ -29,45 +37,49 @@ function History() {
     fetchHistory()
   }, [token])
 
-  const moodStyle = {
-    Calm: 'text-emerald-300',
-    Stressed: 'text-red-300',
-    Tired: 'text-yellow-300',
-    Frustrated: 'text-orange-300',
-    unknown: 'text-neutral-400',
-  }
-
   return (
-    <section className="min-h-screen bg-neutral-950 px-6 pt-28 pb-16 text-white">
-      <div className="mx-auto max-w-7xl">
-        <p className="text-sm font-bold uppercase tracking-[0.24em] text-red-400">Session history</p>
+    <section className="relative min-h-screen overflow-hidden bg-[#150c08] px-6 pt-28 pb-16 text-white">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 46px)',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'radial-gradient(60% 50% at 60% 45%, rgba(234,88,12,0.35) 0%, transparent 70%)' }}
+      />
+
+      <div className="relative mx-auto max-w-5xl">
+        <p className="text-sm font-bold uppercase tracking-[0.24em] text-orange-400">Session history</p>
         <h1 className="mt-3 text-4xl font-black">Previous radio stress reports</h1>
 
-        <div className="mt-8 overflow-hidden rounded-lg border border-white/10">
-          <table className="w-full border-collapse bg-neutral-900 text-left text-sm">
-            <thead className="bg-black text-neutral-300">
+        <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 p-8 backdrop-blur-sm">
+          <table className="w-full border-collapse text-left text-sm">
+            <thead className="text-neutral-400">
               <tr>
-                <th className="px-5 py-4">Time</th>
-                <th className="px-5 py-4">Driver</th>
-                <th className="px-5 py-4">Transcript</th>
-                <th className="px-5 py-4">Mood</th>
-                <th className="px-5 py-4">Confidence</th>
+                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Time</th>
+                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Driver</th>
+                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Transcript</th>
+                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Mood</th>
+                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Confidence</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-400">Loading...</td>
+                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-300">Loading...</td>
                 </tr>
               ) : !token ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-400">
+                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-300">
                     Log in as a team to view history.
                   </td>
                 </tr>
               ) : messages.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-400">
+                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-300">
                     No radio messages recorded yet.
                   </td>
                 </tr>
@@ -78,10 +90,10 @@ function History() {
                       {new Date(msg.createdAt).toLocaleString()}
                     </td>
                     <td className="px-5 py-4 font-bold">{msg.driverId?.name || 'Unknown'}</td>
-                    <td className="px-5 py-4 text-neutral-300 max-w-xs truncate">
+                    <td className="px-5 py-4 text-neutral-200 max-w-xs truncate">
                       {msg.transcript || '—'}
                     </td>
-                    <td className={`px-5 py-4 font-bold ${moodStyle[msg.mood] || ''}`}>
+                    <td className={`px-5 py-4 font-bold ${moodStyle[msg.mood] || moodStyle.unknown}`}>
                       {msg.mood}
                     </td>
                     <td className="px-5 py-4 text-neutral-300">

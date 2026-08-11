@@ -9,16 +9,54 @@ export default function DriverPortal() {
   const [driverSession, setDriverSession] = useState(() => {
     try { return JSON.parse(localStorage.getItem('driverSession')) } catch { return null }
   })
+  const [checkingSession, setCheckingSession] = useState(Boolean(driverSession))
+  const [sessionError, setSessionError] = useState('')
+
+  useEffect(() => {
+    if (!driverSession) return
+
+    const verifyDriver = async () => {
+      setCheckingSession(true)
+      try {
+        const res = await fetch('/api/driver/status', {
+          headers: { 'x-driver-session': driverSession.sessionId },
+        })
+        if (!res.ok) throw new Error('Driver session invalid or expired')
+      } catch (err) {
+        localStorage.removeItem('driverSession')
+        setDriverSession(null)
+        setSessionError('Driver session expired or disconnected. Please reconnect.')
+      } finally {
+        setCheckingSession(false)
+      }
+    }
+
+    verifyDriver()
+  }, [driverSession])
 
   return (
     <BackgroundWrapper>
-      {driverSession ? (
+      {checkingSession ? (
+        <div className="flex min-h-screen items-center justify-center text-white">
+          Verifying driver connection...
+        </div>
+      ) : driverSession ? (
         <PairedView session={driverSession} onDisconnect={() => {
           localStorage.removeItem('driverSession')
           setDriverSession(null)
         }} />
       ) : (
-        <ConnectView onConnected={(session) => setDriverSession(session)} />
+        <>
+          {sessionError && (
+            <div className="mx-auto mb-6 max-w-md rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+              {sessionError}
+            </div>
+          )}
+          <ConnectView onConnected={(session) => {
+            setSessionError('')
+            setDriverSession(session)
+          }} />
+        </>
       )}
     </BackgroundWrapper>
   )

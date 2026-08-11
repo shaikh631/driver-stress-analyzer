@@ -316,7 +316,7 @@ function TeamDashboardPanel() {
               )}
             </div>
           ) : (
-            <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1 scrollbar-thin">
+            <div className="space-y-3 max-h-[520px]  overflow-y-auto pr-1 scrollbar-thin">
               {messages.map((msg, i) => (
                 <RadioMessageCard key={msg._id || i} message={msg} />
               ))}
@@ -326,13 +326,13 @@ function TeamDashboardPanel() {
 
         {/* Right: Lap Time Chart */}
         <div>
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]  text-white/50">
             Lap Performance
           </h2>
           <LapTimeChart laps={laps} messages={messages} />
 
           {/* Stats grid */}
-          <div className="mt-4 grid grid-cols-3 gap-3">
+          <div className="mt-4 grid grid-cols-3  gap-3">
             {[
               { label: 'Drivers', value: drivers.length || '—' },
               { label: 'Messages', value: messages.length },

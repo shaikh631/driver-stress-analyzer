@@ -4,6 +4,7 @@ import Header from './Component/Header';
 import Footer from './Component/Footer';
 
 function Layout() {
+  const navigate = useNavigate();
   const openDriverModal = () => navigate('/driver');
 
   return (
