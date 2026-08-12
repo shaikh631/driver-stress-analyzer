@@ -5,7 +5,7 @@ import './index.css'
 import { Provider } from 'react-redux'
 import store from './Store/store.js'
 import Layout from './Layout.jsx'
-import { DriverPortal, TeamDashboard, LiveMonitoring, Home, History } from './index.js'
+import { DriverPortal, TeamDashboard, LiveMonitoring, Home, History,About , Contact } from './index.js'
 
 const router = createBrowserRouter([
     {
@@ -18,6 +18,8 @@ const router = createBrowserRouter([
 
         { path: '/live', element: <LiveMonitoring /> },
         { path: '/history', element: <History /> },
+        {path : '/about', element: <About />},
+        {path : '/contact', element: <Contact />},
       ],
     },
   ]);

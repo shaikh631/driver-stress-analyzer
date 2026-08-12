@@ -5,6 +5,8 @@ import History from "./pages/History"
 import Home from './pages/Home'
 import LiveMonitoring from './pages/LiveMonitoring'
 import TeamDashboard from "./pages/TeamDashbord"
+import About from "./pages/About"
+import Contact from "./pages/Contact"
 
 export{
     Header,
@@ -13,5 +15,7 @@ export{
     History,
     Home,
     LiveMonitoring,
-    TeamDashboard
+    TeamDashboard,
+    About,
+    Contact
 }

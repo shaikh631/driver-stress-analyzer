@@ -3,23 +3,25 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { FaFacebookF, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa'
-
+// import { useSelector, useDispatch } from 'react-redux'
+// import { logout } from '../Store/authSlice'
+// const authStatus = useSelector((state) => state.auth.status)
 const footerLinks = [
   {
     heading: 'Console',
     links: [
       { label: 'Home', path: '/' },
       { label: 'Driver', path: '/driver' },
-      { label: 'Team', path: '/team/auth' },
+      { label: 'Team', path: '/team' , },
       { label: 'Live', path: '/live' },
-      { label: 'History', path: '/history' },
+      { label: 'History', path: '/history'},
     ],
   },
   {
     heading: 'Company',
     links: [
       { label: 'About', path: '/about' },
-      { label: 'Careers', path: '/careers' },
+      // { label: 'Careers', path: '/careers' },
       { label: 'Contact', path: '/contact' },
     ],
   },
@@ -66,7 +68,7 @@ function Footer() {
             </p>
 
             <Link
-              to="/team/auth"
+              to="/team"
               className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/10"
             >
               <span>Join the team</span>
