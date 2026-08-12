@@ -200,12 +200,28 @@ function ConnectView({ onConnected }) {
    ═══════════════════════════════════════════════════ */
 function PairedView({ session, onDisconnect }) {
   const [recordState, setRecordState] = useState('idle') // idle | recording | uploading | processed
+  const [recordSeconds, setRecordSeconds] = useState(0)
   const [lastResult, setLastResult] = useState(null)
   const [recentSends, setRecentSends] = useState([])
   const [showRecent, setShowRecent] = useState(false)
   const mediaRecorderRef = useRef(null)
   const chunksRef = useRef([])
   const fileInputRef = useRef(null)
+  const recordingStartedAtRef = useRef(null)
+
+  useEffect(() => {
+    if (recordState !== 'recording') return
+
+    const tick = () => {
+      if (!recordingStartedAtRef.current) return
+      const elapsed = Math.floor((Date.now() - recordingStartedAtRef.current) / 1000)
+      setRecordSeconds(elapsed)
+    }
+
+    tick()
+    const intervalId = setInterval(tick, 250)
+    return () => clearInterval(intervalId)
+  }, [recordState])
 
   const uploadAudio = async (blob) => {
     setRecordState('uploading')
@@ -224,24 +240,34 @@ function PairedView({ session, onDisconnect }) {
       setLastResult(result)
       setRecentSends((prev) => [result, ...prev].slice(0, 5))
       setRecordState('processed')
-      setTimeout(() => setRecordState('idle'), 3000)
+      setTimeout(() => {
+        setRecordState('idle')
+        setRecordSeconds(0)
+      }, 3000)
     } catch (err) {
       console.error(err)
       setRecordState('idle')
+      setRecordSeconds(0)
     }
   }
 
   const startRecording = async () => {
+    if (recordState === 'recording' || recordState === 'uploading') return
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mr = new MediaRecorder(stream, { mimeType: 'audio/webm' })
       chunksRef.current = []
+      recordingStartedAtRef.current = Date.now()
+      setRecordSeconds(0)
+
       mr.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data) }
       mr.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
         stream.getTracks().forEach((t) => t.stop())
         if (blob.size > 0) uploadAudio(blob)
       }
+
       mr.start()
       mediaRecorderRef.current = mr
       setRecordState('recording')
@@ -251,9 +277,11 @@ function PairedView({ session, onDisconnect }) {
   }
 
   const stopRecording = () => {
+    if (recordState !== 'recording') return
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop()
     }
+    recordingStartedAtRef.current = null
   }
 
   const handleFileUpload = (e) => {
@@ -271,15 +299,13 @@ function PairedView({ session, onDisconnect }) {
         onDisconnect={onDisconnect}
       />
 
-      {/* Record button — the primary interaction */}
+      {/* Record button — explicit start/stop controls */}
       <div className="mt-16">
         <RecordButton
           state={recordState}
-          onMouseDown={startRecording}
-          onMouseUp={stopRecording}
-          onMouseLeave={() => recordState === 'recording' && stopRecording()}
-          onTouchStart={startRecording}
-          onTouchEnd={stopRecording}
+          recordSeconds={recordSeconds}
+          onStart={startRecording}
+          onStop={stopRecording}
         />
       </div>
 

@@ -1,15 +1,19 @@
 // src/pages/Contact.jsx
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { FaFacebookF, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa'
+import { FaGithub, FaLinkedin, FaYoutube } from 'react-icons/fa'
+import { SiLeetcode } from 'react-icons/si'
 import { FaSatelliteDish, FaEnvelope, FaPhone, FaLocationDot } from 'react-icons/fa6'
 
 const channels = ['ENGINEERING', 'STRATEGY', 'MEDIA', 'PARTNERSHIPS']
 
+// 👇 Replace with your real Formspree endpoint
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xgawyyay'
+
 const contactPoints = [
-  { icon: FaEnvelope, label: 'Email', value: 'ops@codriver.app' },
-  { icon: FaPhone, label: 'Radio line', value: '+1 (555) 019-2044' },
-  { icon: FaLocationDot, label: 'HQ', value: 'Silverstone Technology Park, UK' },
+  { icon: FaEnvelope, label: 'Email', value: 'as9251145@gamil.com' },
+  { icon: FaPhone, label: 'Connect', value: '91+ 7021* *****' },
+  { icon: FaLocationDot, label: 'In', value: 'Mumbai , India' },
 ]
 
 function Waveform({ active }) {
@@ -45,12 +49,40 @@ function Waveform({ active }) {
 function Contact() {
   const [channel, setChannel] = useState(channels[0])
   const [isTyping, setIsTyping] = useState(false)
-  const [status, setStatus] = useState('idle') // idle | sending | sent
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [formData, setFormData] = useState({ name: '', team: '', email: '', message: '' })
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setStatus('sending')
-    setTimeout(() => setStatus('sent'), 1100)
+
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          team: formData.team,
+          email: formData.email,
+          channel,
+          message: formData.message,
+        }),
+      })
+
+      if (res.ok) {
+        setStatus('sent')
+        setFormData({ name: '', team: '', email: '', message: '' })
+      } else {
+        setStatus('error')
+      }
+    } catch (err) {
+      setStatus('error')
+    }
+
     setTimeout(() => setStatus('idle'), 4000)
   }
 
@@ -70,16 +102,17 @@ function Contact() {
 
       {/* Social rail — kept consistent with Home for site-wide chrome */}
       <div className="absolute right-6 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-5 md:flex">
-        {[FaFacebookF, FaInstagram, FaLinkedin, FaYoutube].map((Icon, i) => (
-          <React.Fragment key={i}>
+        {[SiLeetcode, FaGithub, FaLinkedin, FaYoutube].map((Icon, i) => (
+          <div key={i} className="flex flex-col items-center gap-3">
             <a
               href="#"
               className="flex h-8 w-8 items-center justify-center rounded-full border border-white/25 text-white/80 transition hover:border-white hover:text-white"
+              aria-label="Social link"
             >
               <Icon className="h-3.5 w-3.5" />
             </a>
             {i < 3 && <span className="h-6 w-px bg-white/20" />}
-          </React.Fragment>
+          </div>
         ))}
       </div>
 
@@ -146,6 +179,9 @@ function Contact() {
                 <input
                   required
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="Lewis Carter"
                   className="rounded-lg border border-white/15 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-[#ff7a30]"
                 />
@@ -154,6 +190,9 @@ function Contact() {
                 <label className="text-xs uppercase tracking-wide text-white/50">Team / organisation</label>
                 <input
                   type="text"
+                  name="team"
+                  value={formData.team}
+                  onChange={handleChange}
                   placeholder="Apex Racing"
                   className="rounded-lg border border-white/15 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-[#ff7a30]"
                 />
@@ -163,6 +202,9 @@ function Contact() {
                 <input
                   required
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="you@team.com"
                   className="rounded-lg border border-white/15 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-[#ff7a30]"
                 />
@@ -175,6 +217,9 @@ function Contact() {
                 <textarea
                   required
                   rows={4}
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   onFocus={() => setIsTyping(true)}
                   onBlur={() => setIsTyping(false)}
                   placeholder={`Tell us what your ${channel.toLowerCase()} team needs on the wall...`}
@@ -186,12 +231,18 @@ function Contact() {
             <div className="mt-6 flex items-center gap-4">
               <button
                 type="submit"
-                disabled={status !== 'idle'}
+                disabled={status === 'sending'}
                 className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 backdrop-blur-sm transition hover:bg-white/10 disabled:opacity-60"
               >
                 <FaSatelliteDish className="h-4 w-4 text-[#ff7a30]" />
                 <span className="text-sm font-semibold">
-                  {status === 'sending' ? 'TRANSMITTING…' : status === 'sent' ? 'SIGNAL SENT' : 'TRANSMIT'}
+                  {status === 'sending'
+                    ? 'TRANSMITTING…'
+                    : status === 'sent'
+                    ? 'SIGNAL SENT'
+                    : status === 'error'
+                    ? 'RETRY TRANSMIT'
+                    : 'TRANSMIT'}
                 </span>
               </button>
 
@@ -204,6 +255,16 @@ function Contact() {
                     className="text-xs text-white/50"
                   >
                     Received on {channel} — we'll reply within one race weekend.
+                  </motion.span>
+                )}
+                {status === 'error' && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-xs text-red-400"
+                  >
+                    Signal lost — please try again.
                   </motion.span>
                 )}
               </AnimatePresence>

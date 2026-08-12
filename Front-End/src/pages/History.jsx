@@ -39,65 +39,72 @@ function History() {
   }, [token])
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#150c08] px-6 pt-28 pb-16 text-white">
+    <section className="relative min-h-screen w-full overflow-hidden bg-[#0a0503] px-6 pt-28 pb-16 text-white md:px-12">
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage:
-            'repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 46px)',
+          background: `
+            radial-gradient(120% 90% at 78% 45%, rgba(255,106,44,0.0) 0%, rgba(10,5,3,0.55) 55%, rgba(10,5,3,0.95) 78%),
+            repeating-linear-gradient(90deg, rgba(255,122,48,0.9) 0px, rgba(255,90,20,0.9) 3px, rgba(190,58,10,0.9) 3px, rgba(190,58,10,0.9) 34px),
+            linear-gradient(90deg, #0a0503 0%, #170a04 30%, #3a1204 55%, #7a2b06 75%, #a83e0a 100%)
+          `,
         }}
       />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: 'radial-gradient(60% 50% at 60% 45%, rgba(234,88,12,0.35) 0%, transparent 70%)' }}
-      />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-[#0a0503] via-transparent to-[#0a0503]/40" />
 
-      <div className="relative mx-auto max-w-5xl">
-        <p className="text-sm font-bold uppercase tracking-[0.24em] text-orange-400">Session history</p>
-        <h1 className="mt-3 text-4xl font-black">Previous radio stress reports</h1>
+      <div className="relative z-10 mx-auto max-w-5xl">
+        <p className="text-sm font-semibold uppercase tracking-wide text-white/70">Session history</p>
+        <h1 className="mt-4 leading-[1.05]">
+          <span className="block text-4xl font-black tracking-tight text-white md:text-5xl">
+            Previous radio
+          </span>
+          <span className="block text-4xl font-light tracking-tight text-white/90 md:text-5xl">
+            stress reports
+          </span>
+        </h1>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 p-8 backdrop-blur-sm">
+        <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm md:p-8">
           <table className="w-full border-collapse text-left text-sm">
-            <thead className="text-neutral-400">
+            <thead className="text-white/50">
               <tr>
-                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Time</th>
-                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Driver</th>
-                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Transcript</th>
-                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Mood</th>
-                <th className="px-5 py-4 font-bold uppercase tracking-wider text-xs">Confidence</th>
+                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide">Time</th>
+                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide">Driver</th>
+                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide">Transcript</th>
+                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide">Mood</th>
+                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wide">Confidence</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-300">Loading...</td>
+                  <td colSpan={5} className="px-5 py-8 text-center text-white/60">Loading...</td>
                 </tr>
               ) : !token ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-300">
+                  <td colSpan={5} className="px-5 py-8 text-center text-white/60">
                     Log in as a team to view history.
                   </td>
                 </tr>
               ) : messages.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-neutral-300">
+                  <td colSpan={5} className="px-5 py-8 text-center text-white/60">
                     No radio messages recorded yet.
                   </td>
                 </tr>
               ) : (
                 messages.map((msg) => (
                   <tr key={msg._id} className="border-t border-white/10">
-                    <td className="px-5 py-4 text-neutral-300">
+                    <td className="px-5 py-4 text-white/70">
                       {new Date(msg.createdAt).toLocaleString()}
                     </td>
-                    <td className="px-5 py-4 font-bold">{msg.driverId?.name || 'Unknown'}</td>
-                    <td className="px-5 py-4 text-neutral-200 max-w-xs truncate">
+                    <td className="px-5 py-4 font-semibold text-white/90">{msg.driverId?.name || 'Unknown'}</td>
+                    <td className="px-5 py-4 max-w-xs truncate text-white/70">
                       {msg.transcript || '—'}
                     </td>
-                    <td className={`px-5 py-4 font-bold ${moodStyle[msg.mood] || moodStyle.unknown}`}>
+                    <td className={`px-5 py-4 font-semibold ${moodStyle[msg.mood] || moodStyle.unknown}`}>
                       {msg.mood}
                     </td>
-                    <td className="px-5 py-4 text-neutral-300">
+                    <td className="px-5 py-4 text-white/70">
                       {Math.round(msg.confidence * 100)}%
                     </td>
                   </tr>

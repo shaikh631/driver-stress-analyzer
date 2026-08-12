@@ -2,7 +2,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
-import { FaFacebookF, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa'
+import { FaGithub, FaLinkedin, FaYoutube } from 'react-icons/fa'
+import { SiLeetcode } from 'react-icons/si'
 // import { useSelector, useDispatch } from 'react-redux'
 // import { logout } from '../Store/authSlice'
 // const authStatus = useSelector((state) => state.auth.status)
@@ -35,10 +36,10 @@ const footerLinks = [
 ]
 
 const socialLinks = [
-  { icon: FaFacebookF, label: 'Facebook', href: '#' },
-  { icon: FaInstagram, label: 'Instagram', href: '#' },
-  { icon: FaLinkedin, label: 'LinkedIn', href: '#' },
-  { icon: FaYoutube, label: 'Youtube', href: '#' },
+  { icon: SiLeetcode, label: 'Leetcode', href: 'https://leetcode.com/u/ayan_9819/' },
+  { icon: FaGithub, label: 'GitHub', href: 'https://github.com/shaikh631' },
+  { icon: FaLinkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/ayan-shaikh-60b271219/' },
+  { icon: FaYoutube, label: 'Youtube', href: 'https://www.youtube.com/' },
 ]
 
 function Footer() {

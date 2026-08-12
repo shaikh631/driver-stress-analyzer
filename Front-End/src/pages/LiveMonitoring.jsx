@@ -6,7 +6,7 @@ const moodColor = {
   stressed: 'text-red-300 border-red-400/30 bg-red-400/10',
   tired: 'text-yellow-200 border-yellow-400/30 bg-yellow-400/10',
   frustrated: 'text-orange-300 border-orange-400/30 bg-orange-400/10',
-  unknown: 'text-neutral-400 border-white/15 bg-white/5',
+  unknown: 'text-white/50 border-white/15 bg-white/5',
 }
 
 function MoodBadge({ mood }) {
@@ -78,7 +78,7 @@ function LiveMonitoring() {
       label: 'Voice Stress',
       value: latestMsg ? Math.round((latestMsg.confidence || 0) * 100) : 0,
       display: latestMsg ? `${Math.round((latestMsg.confidence || 0) * 100)}%` : '—',
-      color: 'bg-orange-500',
+      color: 'bg-[#ff7a30]',
     },
   ]
 
@@ -98,39 +98,39 @@ function LiveMonitoring() {
   const driverCount = new Set(laps.map((l) => l.driverId?._id || l.driverId?.name).filter(Boolean)).size
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#120b08] px-6 pt-28 pb-16 text-white">
-      {/* Ambient grid + glow background, matches the pit-wall dashboard theme */}
+    <section className="relative min-h-screen w-full overflow-hidden bg-[#0a0503] px-6 pt-28 pb-16 text-white md:px-12">
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage:
-            'repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 48px)',
+          background: `
+            radial-gradient(120% 90% at 78% 45%, rgba(255,106,44,0.0) 0%, rgba(10,5,3,0.55) 55%, rgba(10,5,3,0.95) 78%),
+            repeating-linear-gradient(90deg, rgba(255,122,48,0.9) 0px, rgba(255,90,20,0.9) 3px, rgba(190,58,10,0.9) 3px, rgba(190,58,10,0.9) 34px),
+            linear-gradient(90deg, #0a0503 0%, #170a04 30%, #3a1204 55%, #7a2b06 75%, #a83e0a 100%)
+          `,
         }}
       />
-      <div
-        className="pointer-events-none absolute -top-40 right-0 h-[36rem] w-[36rem] rounded-full opacity-30 blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(234,88,12,0.55) 0%, transparent 70%)' }}
-      />
-      <div
-        className="pointer-events-none absolute bottom-0 left-0 h-[28rem] w-[28rem] rounded-full opacity-20 blur-3xl"
-        style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.4) 0%, transparent 70%)' }}
-      />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-[#0a0503] via-transparent to-[#0a0503]/40" />
 
-      <div className="relative mx-auto max-w-7xl">
+      <div className="relative z-10 mx-auto max-w-7xl">
         {/* Header */}
         <div className="flex flex-col gap-6 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.24em] text-orange-400">Live monitoring</p>
-            <h1 className="mt-3 text-4xl font-black">
-              {loading ? 'Loading telemetry...' : 'Driver telemetry and stress feed'}
+            <p className="text-sm font-semibold uppercase tracking-wide text-white/70">Live monitoring</p>
+            <h1 className="mt-4 leading-[1.05]">
+              <span className="block text-4xl font-black tracking-tight text-white md:text-5xl">
+                {loading ? 'Loading' : 'Driver telemetry'}
+              </span>
+              <span className="block text-4xl font-light tracking-tight text-white/90 md:text-5xl">
+                {loading ? 'telemetry...' : 'and stress feed'}
+              </span>
             </h1>
           </div>
 
-          <div className="w-full max-w-xs rounded-lg border border-orange-400/25 bg-black/30 px-5 py-4 backdrop-blur-sm md:w-auto">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-300">Session status</p>
+          <div className="w-full max-w-xs rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-sm md:w-auto">
+            <p className="text-xs uppercase tracking-wide text-white/50">Session status</p>
             <div className="mt-2 flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${messages.length > 0 ? 'bg-emerald-400' : 'bg-neutral-500'}`} />
-              <span className="text-lg font-black">
+              <span className={`h-2 w-2 rounded-full ${messages.length > 0 ? 'bg-emerald-400' : 'bg-white/30'}`} />
+              <span className="text-lg font-bold text-white/90">
                 {messages.length > 0 ? `Active — ${messages.length} messages` : 'Waiting for data'}
               </span>
             </div>
@@ -140,14 +140,14 @@ function LiveMonitoring() {
         {/* Main grid */}
         <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           {/* Driver condition */}
-          <div className="rounded-lg border border-white/10 bg-black/30 p-6 backdrop-blur-sm">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-300">Driver condition</p>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <p className="text-xs uppercase tracking-wide text-white/50">Driver condition</p>
             <div className="mt-6 space-y-5">
               {telemetry.map((item) => (
                 <div key={item.label}>
                   <div className="mb-2 flex items-center justify-between text-sm">
-                    <span className="text-neutral-400">{item.label}</span>
-                    <span className="font-bold text-white">{item.display}</span>
+                    <span className="text-white/60">{item.label}</span>
+                    <span className="font-semibold text-white/90">{item.display}</span>
                   </div>
                   <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
                     <div
@@ -161,20 +161,20 @@ function LiveMonitoring() {
           </div>
 
           {/* Lap analysis */}
-          <div className="rounded-lg border border-white/10 bg-black/30 p-6 backdrop-blur-sm">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-300">Lap analysis</p>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <p className="text-xs uppercase tracking-wide text-white/50">Lap analysis</p>
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               {sectors.map((sector) => (
-                <article key={sector.label} className="rounded-md border border-white/5 bg-black/40 p-5">
-                  <p className="text-sm text-neutral-400">{sector.label}</p>
-                  <p className="mt-2 text-3xl font-black">{sector.time}</p>
-                  <p className="mt-3 text-sm text-orange-300">{sector.state}</p>
+                <article key={sector.label} className="rounded-xl border border-white/10 bg-black/20 p-5">
+                  <p className="text-sm text-white/50">{sector.label}</p>
+                  <p className="mt-2 text-3xl font-black text-white/90">{sector.time}</p>
+                  <p className="mt-3 text-sm text-[#ff7a30]">{sector.state}</p>
                 </article>
               ))}
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 rounded-md border border-yellow-400/25 bg-yellow-400/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-yellow-100">
+            <div className="mt-6 flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-white/70">
                 {latestMsg
                   ? (latestMsg.reasoning || 'Analysis pending...')
                   : 'Waiting for driver radio transmission for stress analysis...'}
@@ -186,17 +186,17 @@ function LiveMonitoring() {
 
         {/* Stat row */}
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-white/10 bg-black/30 p-6 text-center backdrop-blur-sm">
-            <p className="text-4xl font-black">{driverCount || '—'}</p>
-            <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-neutral-400">Drivers</p>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-sm">
+            <p className="text-4xl font-black text-white/90">{driverCount || '—'}</p>
+            <p className="mt-1 text-xs uppercase tracking-wide text-white/50">Drivers</p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-black/30 p-6 text-center backdrop-blur-sm">
-            <p className="text-4xl font-black">{messages.length}</p>
-            <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-neutral-400">Messages</p>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-sm">
+            <p className="text-4xl font-black text-white/90">{messages.length}</p>
+            <p className="mt-1 text-xs uppercase tracking-wide text-white/50">Messages</p>
           </div>
-          <div className="rounded-lg border border-white/10 bg-black/30 p-6 text-center backdrop-blur-sm">
-            <p className="text-4xl font-black">{laps.length}</p>
-            <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-neutral-400">Laps</p>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-sm">
+            <p className="text-4xl font-black text-white/90">{laps.length}</p>
+            <p className="mt-1 text-xs uppercase tracking-wide text-white/50">Laps</p>
           </div>
         </div>
       </div>
